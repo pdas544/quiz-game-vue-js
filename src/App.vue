@@ -1,17 +1,29 @@
 <template>
   <div>
     <h1>My Quiz Game</h1>
-    <h2>Question: <span>Python is a programming language.</span></h2>
+    <h2 v-html="question"></h2>
     
-    <div class="options">
-      <input type="radio" name="options" id="" value="True">
-      <label for="">True</label>
-      <input type="radio" name="options" id="" value="False">
-      <label for="">False</label>
-      
+    <div class="options" >
+      <template v-for="(answer,index) in answers" :key="index">
+        <input type="radio" 
+        :disabled="this.answerSubmitted"
+        name="options" 
+        id="" 
+        :value="answer"
+        v-model="chosenAnswer">
+        <label v-html="answer"></label>
+      </template>
+
     </div>
-    <button class="btn-submit">Submit</button>
+    <button class="btn-submit" @click="submitAnswer">Submit</button>
   </div>
+  <div v-if="this.answerSubmitted"> 
+    <h4 v-if="this.chosenAnswer != this.correctAnswer"> &#160; Sorry, Your answer is incorrect. Correct Answer is {{ this.correctAnswer }} </h4>
+    <h4 v-else> &#9989; Your Answer is Correct! </h4>
+    <button class="btn-submit">Next Question</button>
+    
+  </div>
+  
   
 </template>
 
@@ -20,6 +32,57 @@
 
 export default {
   name: 'App',
+  methods: {
+    submitAnswer() {
+      if(!this.chosenAnswer) {
+        alert('Please select an answer before submitting.');
+        return;
+      }else{
+        this.answerSubmitted = true;
+        if(this.chosenAnswer == this.correctAnswer) {
+          alert('Correct!');
+        }else{
+          alert('Incorrect!');
+        }
+      }
+      
+    }
+  },
+
+
+  data() {
+    return {
+      question: undefined,
+      correctAnswer: undefined,
+      incorrectAnswer: undefined,
+      chosenAnswer: undefined,
+      answerSubmitted: false
+    }
+  },
+
+  computed:{
+    answers() { 
+      if (!this.incorrectAnswer || !this.correctAnswer) {
+        return [];
+      }
+      var answers = JSON.parse(JSON.stringify(this.incorrectAnswer));
+
+      answers.splice(Math.round(Math.random() * answers.length), 0, this.correctAnswer);
+      return answers;
+    }
+  },
+
+  created() {
+    this.axios
+    .get('https://opentdb.com/api.php?amount=10&category=18')
+    .then((response) => {
+      // console.log(response.data.results[0]);
+      this.question = response.data.results[0].question;
+      this.correctAnswer = response.data.results[0].correct_answer;
+      this.incorrectAnswer = response.data.results[0].incorrect_answers;
+    })
+    
+  }
 
 }
 </script>
