@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>My Quiz Game</h1>
+    <ScoreBoard :playerScore="playerScore" :computerScore="computerScore" />
     <h2 v-html="question"></h2>
     
     <div class="options" >
@@ -28,10 +29,13 @@
 </template>
 
 <script>
-
+import ScoreBoard from './components/ScoreBoard.vue';
 
 export default {
   name: 'App',
+  components: {
+    ScoreBoard
+  },
   methods: {
     submitAnswer() {
       if(!this.chosenAnswer) {
@@ -40,9 +44,11 @@ export default {
       }else{
         this.answerSubmitted = true;
         if(this.chosenAnswer == this.correctAnswer) {
-          alert('Correct!');
+          this.playerScore++;
+          // alert('Correct!');
         }else{
-          alert('Incorrect!');
+          // alert('Incorrect!');
+          this.computerScore++;
         }
       }
       
@@ -70,7 +76,9 @@ export default {
       correctAnswer: undefined,
       incorrectAnswer: undefined,
       chosenAnswer: undefined,
-      answerSubmitted: false
+      answerSubmitted: false,
+      playerScore:0,
+      computerScore:0
     }
   },
 
@@ -137,7 +145,7 @@ export default {
   margin-top: 30px;
 }
 
-.btn-submit{
+#app.btn-submit{
   padding: 10px 20px;
   background-color: blue;
   color: white;
@@ -145,4 +153,5 @@ export default {
   border-radius: 8px;
   cursor: pointer;
 }
+
 </style>
